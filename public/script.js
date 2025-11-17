@@ -12,6 +12,8 @@ let botonLimpiar = document.getElementById("botonLimpiar");
 let criterio = document.getElementById("selectPrecio");
 let botonCerrarModal = document.getElementById("modalCloseBtn");
 const selectTienda = document.getElementById("selectTienda");
+const spinnerOverlay = document.getElementById("spinner-overlay");
+const spinnerError = document.getElementById("spinner-error");
 //VARIABLES DE ESTADO
 let paginaActual = 1;
 let limite = 12;
@@ -19,71 +21,30 @@ let validacionResultados;
 let juegosActuales = [];
 //VARAIBLES DE LINKS
 let linkTienda = "https://www.cheapshark.com/redirect?dealID=";
+//GESTION BOTON DE BUSCAR
+botonBuscar.disabled = true;
 /*********************************************************** */
 
-// addEventListener: cerrar el modal cuando se presione el botón global
-if (botonCerrarModal) {
-  botonCerrarModal.addEventListener("click", () => {
-    // Buscar y remover sólo el modal (no el botón que vive en el contenedor)
-    const modalAbierto = modalContainer.querySelector(".modal");
-    if (modalAbierto) modalAbierto.remove();
-    // Ocultar el contenedor y el botón
-    modalContainer.style.display = "none";
-    botonCerrarModal.hidden = true;
-  });
-}
-
-//SELECT DE TIENDAS
-
-//FUNCION PARA OBTENER TIENDAS Y POBLAR SELECT
-async function poblarSelectTiendas() {
-  try {
-    const respuesta = await fetch("https://www.cheapshark.com/api/1.0/stores");
-    const tiendas = await respuesta.json();
-    tiendas.forEach((tienda) => {
-      const option = document.createElement("option");
-      option.value = tienda.storeID;
-      option.textContent = tienda.storeName;
-      selectTienda.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error al cargar tiendas:", error);
-  }
-}
-
-//LLAMAR AL INICIAR
-
-//SPINNER OVERLAY Y ERROR
-const spinnerOverlay = document.getElementById("spinner-overlay"); //Overlay centrado
-const spinnerError = document.getElementById("spinner-error"); //Mensaje de error
-
+/*********************************
+ * FUNCIONES DE SPINNER
+ *********************************/
 //FUNCION MOSTRAR SPINNER
-//FUNCION MOSTRAR SPINNER (mantener visible mínimo 3 segundos)
 let spinnerMinTimeout;
 function mostrarSpinner() {
+  //QUITAR CLASE QUE OCULATABA SPINNER
   spinnerOverlay.classList.remove("hidden");
+  //OCULTAR MENSAJE DE ERROR
   spinnerError.classList.add("hidden");
   spinnerError.textContent = "";
-  // Inicia temporizador mínimo
-  spinnerMinTimeout = Date.now();
 }
 
 //FUNCION OCULTAR SPINNER
-//FUNCION OCULTAR SPINNER (espera mínimo 3 segundos)
 function ocultarSpinner() {
-  const elapsed = Date.now() - spinnerMinTimeout;
-  const minTime = 3000;
-  if (elapsed < minTime) {
-    setTimeout(() => {
-      spinnerOverlay.classList.add("hidden");
-      spinnerError.classList.add("hidden");
-      spinnerError.textContent = "";
-    }, minTime - elapsed);
-  } else {
+  setTimeout(() => {
     spinnerOverlay.classList.add("hidden");
     spinnerError.classList.add("hidden");
     spinnerError.textContent = "";
-  }
+  }, 2000);
 }
 
 //FUNCION MOSTRAR ERROR EN SPINNER
@@ -92,18 +53,11 @@ function mostrarErrorSpinner(mensaje) {
   spinnerError.classList.remove("hidden");
   spinnerError.textContent = mensaje;
 }
+/******************************************* */
 
-//GESTION BOTON DE BUSCAR
-botonBuscar.disabled = true;
-
-inputNombre.addEventListener("input", () => {
-  if (inputNombre.value.trim().toLowerCase().length > 0) {
-    botonBuscar.disabled = false;
-  } else {
-    botonBuscar.disabled = true;
-  }
-});
-
+/*********************************
+ * FUNCIONES DE FETCH
+ *********************************/
 //FETCH DE 12 VIDEOJUEGOS
 async function obtenerJuegos() {
   //SPINNER CARGA INICIAL
@@ -113,28 +67,70 @@ async function obtenerJuegos() {
       "https://www.cheapshark.com/api/1.0/deals?pageSize=12"
     );
     const datos = await respuesta.json();
+    //OCULTAR SPINEER DESPUES DE QUE SE HAYAN OBTENIDO LOS DATOS
     ocultarSpinner();
     return datos;
   } catch (error) {
-    mostrarErrorSpinner("Error al cargar los juegos. Intenta de nuevo.");
+    mostrarErrorSpinner("Error al cargar los juegos");
     setTimeout(ocultarSpinner, 2500);
     console.error(error);
     return [];
   }
 }
 
-/***********FUNCION CREAR TARJETA EN HTML*************/
+//FUNCION PARA HACER FETCHS DE TIENDAS PARA EL SELECT
+async function poblarSelectTiendas() {
+  try {
+    const respuesta = await fetch("https://www.cheapshark.com/api/1.0/stores");
+    const tiendas = await respuesta.json();
 
-// FUNCION PARA CREAR EL MODAL DE DETALLE USANDO SOLO createElement Y ORDEN LÓGICO
+    //POBLAR SELECT CON LOS DATOS OBTENIDOS DEL FECTH
+    tiendas.forEach((tienda) => {
+      const option = document.createElement("option");
+      option.value = tienda.storeID;
+      option.textContent = tienda.storeName;
+      selectTienda.appendChild(option);
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+//FETCH DE URL BUSQUEDA
+async function buscarJuegos() {
+  //SPINNER BUSQUEDA
+  mostrarSpinner();
+  try {
+    let respuestaUsuario = inputNombre.value.trim().toLowerCase();
+    const respuesta = await fetch(
+      `https://www.cheapshark.com/api/1.0/games?title=${respuestaUsuario}&limit=${limite}`
+    );
+    const datos = await respuesta.json();
+    ocultarSpinner();
+    return datos;
+  } catch (error) {
+    mostrarErrorSpinner("Error al buscar juegos.");
+    setTimeout(ocultarSpinner, 2500);
+    console.error(error);
+    return [];
+  }
+}
+
+/********************************** */
+
+/*********************************
+ * FUNCION CREAR ELEMENTOS EN HTML
+ * *******************************/
+// FUNCION PARA CREAR EL MODA
 function crearModal(juego, esDeal) {
-  // 1. CREACION DE VARIABLES
+  // CREACION DE VARIABLES PARA DIFERENCIAR ENDPOINTS
   const tituloJuego = esDeal ? juego.title : juego.external;
   const precioNormalJuego = juego.normalPrice;
   const precioDescuentoJuego = esDeal ? juego.salePrice : juego.cheapest;
   const enlaceJuego = esDeal ? juego.dealID : juego.cheapestDealID;
   const imagenJuego = juego.thumb;
 
-  // 2. CREACION DE ELEMENTOS
+  //CREACION DE ELEMENTOS HTML
   const modal = document.createElement("div");
   const modalContent = document.createElement("div");
   const titulo = document.createElement("h2");
@@ -143,7 +139,7 @@ function crearModal(juego, esDeal) {
   const precioDescuento = document.createElement("p");
   const link = document.createElement("a");
 
-  // 3. ASIGNACION DE VALORES
+  // ASIGNACION DE VALORES A ELEMENTOS
   titulo.textContent = tituloJuego;
   img.src = imagenJuego;
   img.alt = tituloJuego;
@@ -153,21 +149,10 @@ function crearModal(juego, esDeal) {
   link.href = linkTienda + enlaceJuego;
   link.target = "_blank";
 
-  // 4. ASIGNACION DE ESTILOS
+  // ASIGNACION DE ESTILOS
   modal.className = "modal";
 
-  // 5. ASIGNACION DE EVENTOS
-  // Cerrar al hacer click fuera del modalContent
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      // Remover el modal y ocultar el contenedor y el botón
-      modal.remove();
-      if (botonCerrarModal) botonCerrarModal.hidden = true;
-      modalContainer.style.display = "none";
-    }
-  });
-
-  // 6. ARMADO DEL MODAL
+  //APPEND DE ELEMENTOS AL MODAL
   modalContent.appendChild(titulo);
   modalContent.appendChild(img);
   modalContent.appendChild(precioNormal);
@@ -175,55 +160,49 @@ function crearModal(juego, esDeal) {
   modalContent.appendChild(link);
   modal.appendChild(modalContent);
 
-  // 7. AGREGAR MODAL AL modalContainer
+  //AGREGAR MODAL AL CONTENEDOR
   modalContainer.appendChild(modal);
 
-  // Mostrar el contenedor y el botón global de cerrar cuando el modal está abierto
+  //CUANDO SE MUESTRA EL MODAL SE DAN ESTILOS AL CONTENEDOR
   modalContainer.style.display = "flex";
   if (botonCerrarModal) botonCerrarModal.hidden = false;
 }
 
-//FUNCION CREAR TARJETA PRINCIPAL
-
-// FUNCION PARA CREAR UNA TARJETA DE JUEGO DE FORMA ORDENADA Y LÓGICA
+// FUNCION PARA CREAR LAS TARJETAS DE JUEGOS
 function crearTarjeta(juego, esDeal) {
-  // 1. CREACION DE VARIABLES
+  //CREACION DE VARIABLES PARA LOS DOS ENDPOINTS
   const tituloJuego = esDeal ? juego.title : juego.external;
   const imagenJuego = juego.thumb;
 
-  // 2. CREACION DE ELEMENTOS
+  //CREACION DE ELEMENTOS HTML
   const tarjeta = document.createElement("section");
   const img = document.createElement("img");
   const titulo = document.createElement("h2");
   const boton = document.createElement("button");
 
-  // 3. ASIGNACION DE VALORES
+  //ASIGNACION DE VALORES A ELEMENTOS
   img.src = imagenJuego;
   img.alt = tituloJuego;
   titulo.textContent = tituloJuego;
   boton.textContent = "Ver detalle";
 
-  // 4. ASIGNACION DE ESTILOS
-  tarjeta.className =
-    "flex flex-col items-center border rounded-lg p-4 m-2 bg-white shadow";
-  img.className = "w-32 h-32 object-contain mb-2";
-  titulo.className = "text-lg font-bold mb-2 text-center";
-  boton.className =
-    "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition";
+  //ASIGNACION DE ESTILOS
+  tarjeta.className = "card";
 
-  // 5. ASIGNACION DE EVENTOS
+  //ASIGNACION DE EVENTOS PARA MOSTRAR MODAL
   boton.addEventListener("click", function () {
     crearModal(juego, esDeal);
   });
 
-  // 6. ARMADO DE LA TARJETA
+  // APPEND DE ELEMENTO A TARJETA DE JUEGO
   tarjeta.appendChild(img);
   tarjeta.appendChild(titulo);
   tarjeta.appendChild(boton);
 
-  // 7. RETORNO DEL ELEMENTO
+  //RETORNAR TARJETA
   return tarjeta;
 }
+/********************************************** */
 
 //FUNCION PARA INSERTAR JUEGOS EN HTML
 function insertarJuegos(juegos) {
@@ -267,27 +246,6 @@ async function cargarJuegos() {
     ocultarSpinner();
     insertarJuegos(juegos);
   }, 2000);
-}
-
-/************** FUNCION DE BUSQUEDA *************************/
-//FETCH DE URL BUSQUEDA
-async function buscarJuegos() {
-  //SPINNER BUSQUEDA
-  mostrarSpinner();
-  try {
-    let respuestaUsuario = inputNombre.value.trim().toLowerCase();
-    const respuesta = await fetch(
-      `https://www.cheapshark.com/api/1.0/games?title=${respuestaUsuario}&limit=${limite}`
-    );
-    const datos = await respuesta.json();
-    ocultarSpinner();
-    return datos;
-  } catch (error) {
-    mostrarErrorSpinner("Error al buscar juegos. Intenta de nuevo.");
-    setTimeout(ocultarSpinner, 2500);
-    console.error(error);
-    return [];
-  }
 }
 
 //INSERTAR DATOS BUSQUEDA EN EL HTML
@@ -473,6 +431,27 @@ criterio.addEventListener("change", () => {
   }
 });
 
+// CERRAR EL MODAL
+if (botonCerrarModal) {
+  botonCerrarModal.addEventListener("click", () => {
+    // CERRAR EL MODAL AL HACER CLICK EN BOTON X DEL CONTENEDOR
+    const modalAbierto = modalContainer.querySelector(".modal");
+    if (modalAbierto) modalAbierto.remove();
+    // OCULTAR CONTENEDOR Y BOTON
+    modalContainer.style.display = "none";
+  });
+}
+
+//EVENTO PARA ACTIVAR BOTON DE BUSQUEDA
+inputNombre.addEventListener("input", () => {
+  //SI HAY MAS DE UNA LETRA EN EL INPUT NOMBRE SE ACTIVA EL BOTON
+  if (inputNombre.value.trim().toLowerCase().length > 0) {
+    botonBuscar.disabled = false;
+  } else {
+    botonBuscar.disabled = true;
+  }
+});
+
 //BOTON LIMPIA BUSQUEDA
 botonLimpiar.addEventListener("click", () => {
   //RESETEAR NOMBRE
@@ -483,6 +462,7 @@ botonLimpiar.addEventListener("click", () => {
   selectTienda.value = "";
   cargarJuegos();
 });
+
 /********************************************** */
 
 /******************************************
