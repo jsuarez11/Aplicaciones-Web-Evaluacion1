@@ -4,23 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Evaluación de Aplicaciones Web</title>
+    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="output.css" />
   </head>
   <body>
     <header></header>
     <main>
       <article>
-        <input type="text" name="nombre" id="nombre" />
+        <div>
+          <select name="selectPrecio" id="selectPrecio">
+            <option value="">Ordenar por...</option>
+            <option value="normal">Precio normal</option>
+            <option value="oferta">Precio en oferta</option>
+          </select>
+        </div>
+        <div>
+          <!--SELECT FILTRADO POR TIENDA-->
+          <select id="selectTienda">
+            <option value="">Todas las tiendas</option>
+            <!--Opciones dinámicas-->
+          </select>
+        </div>
+        <div>
+          <input type="text" name="nombre" id="nombre" />
 
-        <button id="botonBuscar">Buscar</button>
-        <button id="botonLimpiar">Limpiar</button>
+          <button id="botonBuscar">Buscar</button>
+          <button id="botonLimpiar">Limpiar</button>
+        </div>
       </article>
 
       <article id="juegos-container"></article>
-
+      <article id="modalContainer" class="container--modal">
+        <button
+          id="modalCloseBtn"
+          class="modal__close"
+          hidden
+          aria-label="Cerrar modal"
+        >
+          ×
+        </button>
+      </article>
       <!--BOTON VERMAS DEALS-->
       <button id="botonVerDeals">Ver más</button>
       <button id="botonVerGames">Ver más Games</button>
+      <!--MODAL DETALLE JUEGO-->
+      <!-- Modal removed for interface cleanup -->
+      <!--SPINNER OVERLAY CENTRADO-->
+      <div
+        id="spinner-overlay"
+        class="fixed inset-0 flex items-center justify-center bg-black/50 z-50 hidden"
+      >
+        <div class="flex flex-col items-center">
+          <!--SPINNER ANIMADO TAILWIND-->
+          <div
+            class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+          ></div>
+          <!--MENSAJE DE ERROR SPINNER-->
+          <p id="spinner-error" class="mt-4 text-red-500 text-lg hidden"></p>
+          <span class="mt-2 text-white">Cargando...</span>
+        </div>
+      </div>
     </main>
   </body>
 
