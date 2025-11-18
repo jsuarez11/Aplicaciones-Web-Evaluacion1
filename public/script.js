@@ -121,7 +121,7 @@ async function buscarJuegos() {
 /*********************************
  * FUNCION CREAR ELEMENTOS EN HTML
  * *******************************/
-// FUNCION PARA CREAR EL MODA
+// FUNCION PARA CREAR EL MODAL
 function crearModal(juego, esDeal) {
   // CREACION DE VARIABLES PARA DIFERENCIAR ENDPOINTS
   const tituloJuego = esDeal ? juego.title : juego.external;
@@ -129,6 +129,10 @@ function crearModal(juego, esDeal) {
   const precioDescuentoJuego = esDeal ? juego.salePrice : juego.cheapest;
   const enlaceJuego = esDeal ? juego.dealID : juego.cheapestDealID;
   const imagenJuego = juego.thumb;
+
+  //LIMPIAR CUALQUIER MODAL PREVIO ANTES DE CREAR EL NUEVO
+  const modalesExistentes = modalContainer.querySelectorAll(".modal");
+  modalesExistentes.forEach((m) => m.remove());
 
   //CREACION DE ELEMENTOS HTML
   const modal = document.createElement("div");
@@ -150,7 +154,13 @@ function crearModal(juego, esDeal) {
   link.target = "_blank";
 
   // ASIGNACION DE ESTILOS
-  modal.className = "modal";
+  modal.className =
+    "w-[90%] max-w-[400px] flex flex-col flex-nowrap justify-center items-center bg-[rgb(37,132,255)] h-[90%] max-h-[400px] rounded-[20px] text-center text-white font-bold modal";
+  img.className =
+    "w-full object-contain bg-orange-500 rounded-[20px] h-[200px] my-[10px]";
+  modalContent.className = "c";
+  link.className =
+    "bg-orange-500 text-white p-[10px] text-[18px] rounded-[10px] cursor-pointer mt-3";
 
   //APPEND DE ELEMENTOS AL MODAL
   modalContent.appendChild(titulo);
@@ -164,7 +174,8 @@ function crearModal(juego, esDeal) {
   modalContainer.appendChild(modal);
 
   //CUANDO SE MUESTRA EL MODAL SE DAN ESTILOS AL CONTENEDOR
-  modalContainer.style.display = "flex";
+  modalContainer.classList.remove("hidden");
+  modalContainer.classList.add("flex");
   if (botonCerrarModal) botonCerrarModal.hidden = false;
 }
 
@@ -187,7 +198,12 @@ function crearTarjeta(juego, esDeal) {
   boton.textContent = "Ver detalle";
 
   //ASIGNACION DE ESTILOS
-  tarjeta.className = "card";
+  tarjeta.className =
+    "bg-[rgb(12,101,235)] rounded-[10px] flex flex-col flex-nowrap items-center justify-start text-center gap-[10px]";
+  img.className = "bg-[rgb(209,153,0)] h-[60%] object-contain w-full";
+  titulo.className = "text-white font-bold mt-3";
+  boton.className =
+    "bg-[rgb(209,153,0)] text-white p-[10px] rounded-xl cursor-pointer mt-auto w-[80%] mb-2 font-bold";
 
   //ASIGNACION DE EVENTOS PARA MOSTRAR MODAL
   boton.addEventListener("click", function () {
@@ -435,10 +451,13 @@ criterio.addEventListener("change", () => {
 if (botonCerrarModal) {
   botonCerrarModal.addEventListener("click", () => {
     // CERRAR EL MODAL AL HACER CLICK EN BOTON X DEL CONTENEDOR
-    const modalAbierto = modalContainer.querySelector(".modal");
+    const modalAbierto = modalContainer.querySelector(
+      'div[class*="bg-[#427ce9"]'
+    );
     if (modalAbierto) modalAbierto.remove();
     // OCULTAR CONTENEDOR Y BOTON
-    modalContainer.style.display = "none";
+    modalContainer.classList.remove("flex");
+    modalContainer.classList.add("hidden");
   });
 }
 

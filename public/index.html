@@ -4,52 +4,112 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Evaluación de Aplicaciones Web</title>
-    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="output.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header></header>
+    <!--ENCABEZADO PROYECTO-->
+    <header
+      class="bg-gradient-to-r from-[#0f91db] via-[#3372de] via-[#0e6dcc] to-[#2d46eb] flex flex-col flex-nowrap text-center h-[300px] justify-center items-center"
+    >
+      <h1 class="text-[40px] max-[500px]:text-[28px] font-bold text-[#f1f1f1]">
+        Video<span class="text-[#f09206]">ISTER</span>Store
+      </h1>
+      <p
+        class="text-[25px] max-[500px]:text-[22px] font-bold text-[#ffd586] hover:text-[#ffae00] transition-all duration-[30ms] ease-in-out"
+      >
+        ¡Encuentra los mejores juegos y los mejores descuentos en un solo lugar!
+      </p>
+    </header>
+
+    <!--CONTENIDO PRINCIPAL-->
     <main>
-      <article>
+      <!--SECCION DE FILTROS-->
+      <article
+        class="bg-[rgb(76,147,255)] flex flex-row flex-wrap p-5 justify-center items-center gap-10 text-white font-bold"
+      >
+        <!--SELEC DE FILTRADO DE PRECIOS-->
         <div>
-          <select name="selectPrecio" id="selectPrecio">
+          <select
+            name="selectPrecio"
+            id="selectPrecio"
+            class="bg-[aliceblue] text-black font-normal rounded-[10px]"
+          >
             <option value="">Ordenar por...</option>
             <option value="normal">Precio normal</option>
             <option value="oferta">Precio en oferta</option>
           </select>
         </div>
+        <!--SELECT FILTRADO POR TIENDA-->
         <div>
-          <!--SELECT FILTRADO POR TIENDA-->
-          <select id="selectTienda">
+          <select
+            id="selectTienda"
+            class="bg-[aliceblue] text-black font-normal rounded-[10px]"
+          >
             <option value="">Todas las tiendas</option>
-            <!--Opciones dinámicas-->
           </select>
         </div>
-        <div>
-          <input type="text" name="nombre" id="nombre" />
+        <!--INPUT DE NOMBRE Y LIMPIADO DE PARAMETROS-->
+        <div
+          class="flex flex-row flex-wrap items-center justify-center gap-[10px]"
+        >
+          <input
+            type="text"
+            name="nombre"
+            id="nombre"
+            class="bg-[aliceblue] text-black font-normal rounded-[10px]"
+          />
 
-          <button id="botonBuscar">Buscar</button>
-          <button id="botonLimpiar">Limpiar</button>
+          <button
+            id="botonBuscar"
+            class="bg-[rgb(0,50,189)] p-[10px] rounded-[10px] cursor-pointer"
+          >
+            Buscar
+          </button>
+          <button
+            id="botonLimpiar"
+            class="bg-[rgb(0,50,189)] p-[10px] rounded-[10px] cursor-pointer"
+          >
+            Limpiar
+          </button>
         </div>
       </article>
 
-      <article id="juegos-container"></article>
-      <article id="modalContainer" class="container--modal">
+      <!--SECCION DE JUEGOS CARGADOS-->
+      <article
+        id="juegos-container"
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 auto-rows-auto gap-5 p-5"
+      ></article>
+
+      <!--MODAL ESCONDIDO-->
+      <article
+        id="modalContainer"
+        class="fixed inset-0 z-[999] hidden justify-center items-center bg-black/50"
+      >
         <button
           id="modalCloseBtn"
-          class="modal__close"
+          class="fixed top-[18px] right-[18px] z-[1000] bg-[#e98737] text-white border-none w-10 h-10 rounded-md text-xl cursor-pointer flex justify-center items-center text-center"
           hidden
-          aria-label="Cerrar modal"
         >
           ×
         </button>
       </article>
-      <!--BOTON VERMAS DEALS-->
-      <button id="botonVerDeals">Ver más</button>
-      <button id="botonVerGames">Ver más Games</button>
-      <!--MODAL DETALLE JUEGO-->
-      <!-- Modal removed for interface cleanup -->
-      <!--SPINNER OVERLAY CENTRADO-->
+
+      <!--BOTON DINAMICO DE VER MAS-->
+      <button
+        id="botonVerDeals"
+        class="bg-orange-500 w-[90%] max-w-[280px] h-[44px] text-[22px] text-white font-bold mx-auto my-5 rounded-[20px] cursor-pointer hover:bg-orange-600 transition-colors"
+      >
+        Ver más
+      </button>
+      <button
+        id="botonVerGames"
+        class="bg-orange-500 w-[90%] max-w-[280px] h-[44px] text-[22px] text-white font-bold mx-auto my-5 rounded-[20px] cursor-pointer hover:bg-orange-600 transition-colors"
+      >
+        Ver más Games
+      </button>
+
+      <!--SPINNER-->
       <div
         id="spinner-overlay"
         class="fixed inset-0 flex items-center justify-center bg-black/50 z-50 hidden"
@@ -61,11 +121,12 @@
           ></div>
           <!--MENSAJE DE ERROR SPINNER-->
           <p id="spinner-error" class="mt-4 text-red-500 text-lg hidden"></p>
-          <span class="mt-2 text-white">Cargando...</span>
+          <span class="mt-2 text-white font-bold">Cargando...</span>
         </div>
       </div>
     </main>
   </body>
 
+  <!--IMPORT DEL JS-->
   <script src="script.js"></script>
 </html>
