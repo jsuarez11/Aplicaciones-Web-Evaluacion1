@@ -158,7 +158,8 @@ function crearModal(juego, esDeal) {
     "w-[90%] max-w-[400px] flex flex-col flex-nowrap justify-center items-center bg-[rgb(37,132,255)] h-[90%] max-h-[400px] rounded-[20px] text-center text-white font-bold modal";
   img.className =
     "w-full object-contain bg-orange-500 rounded-[20px] h-[200px] my-[10px]";
-  modalContent.className = "c";
+  modalContent.className =
+    "w-full h-full flex flex-col flex-nowrap justify-around items-center p-5";
   link.className =
     "bg-orange-500 text-white p-[10px] text-[18px] rounded-[10px] cursor-pointer mt-3";
 
@@ -364,8 +365,8 @@ async function cargarMasDeals() {
     );
     const datos = await respuesta.json();
 
-    //SUMAR ARRAY NUEVO CON EL ARRAY VIEJO DE JUEGOS
-    juegosActuales = juegosActuales.concat(datos);
+    //REEMPLAZAR EL ARRAY DE JUEGOS CON LOS NUEVOS DATOS
+    juegosActuales = datos;
 
     //MOSTRAR EL SPINNER 2SG, ORDENAR JUEGOS Y MOSTRARLOS
     setTimeout(() => {
@@ -451,10 +452,8 @@ criterio.addEventListener("change", () => {
 if (botonCerrarModal) {
   botonCerrarModal.addEventListener("click", () => {
     // CERRAR EL MODAL AL HACER CLICK EN BOTON X DEL CONTENEDOR
-    const modalAbierto = modalContainer.querySelector(
-      'div[class*="bg-[#427ce9"]'
-    );
-    if (modalAbierto) modalAbierto.remove();
+    const modalesAbiertos = modalContainer.querySelectorAll(".modal");
+    modalesAbiertos.forEach((m) => m.remove());
     // OCULTAR CONTENEDOR Y BOTON
     modalContainer.classList.remove("flex");
     modalContainer.classList.add("hidden");
