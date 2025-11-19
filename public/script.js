@@ -166,7 +166,10 @@ function crearModal(juego, esDeal) {
   //APPEND DE ELEMENTOS AL MODAL
   modalContent.appendChild(titulo);
   modalContent.appendChild(img);
-  modalContent.appendChild(precioNormal);
+  if (esDeal) {
+    modalContent.appendChild(precioNormal);
+  }
+
   modalContent.appendChild(precioDescuento);
   modalContent.appendChild(link);
   modal.appendChild(modalContent);
