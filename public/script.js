@@ -203,7 +203,7 @@ function crearTarjeta(juego, esDeal) {
 
   //ASIGNACION DE ESTILOS
   tarjeta.className =
-    "bg-[rgb(12,101,235)] rounded-[10px] flex flex-col flex-nowrap items-center justify-start text-center gap-[10px]";
+    "bg-[rgb(12,101,235)] rounded-[10px] flex flex-col flex-nowrap items-center justify-start text-center gap-[10px] h-[100px]";
   img.className = "bg-[rgb(209,153,0)] h-[60%] object-contain w-full";
   titulo.className = "text-white font-bold mt-3";
   boton.className =
